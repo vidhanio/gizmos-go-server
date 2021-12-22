@@ -11,7 +11,7 @@ import (
 	"github.com/vidhanio/gizmos-answer-server/config"
 )
 
-func init() {
+func main() {
 	// Initialize zerolog
 
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
@@ -19,9 +19,9 @@ func init() {
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 	multi := zerolog.MultiLevelWriter(zerolog.ConsoleWriter{Out: os.Stdout})
 	log.Logger = zerolog.New(multi).With().Timestamp().Logger()
-}
 
-func main() {
+	// Configure and run the app
+
 	config := config.New()
 	app.ConfigAndRunApp(config)
 }
