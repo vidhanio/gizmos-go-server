@@ -1,4 +1,4 @@
-package handlers
+package httpd
 
 import (
 	"context"
@@ -10,7 +10,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
-	"github.com/vidhanio/gizmos-answer-server/app/models"
+	"github.com/vidhanio/gizmos-answer-server/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

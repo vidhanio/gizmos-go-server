@@ -11,7 +11,7 @@ type Config struct {
 }
 
 func (config *Config) initialize() {
-	config.ServerHost = os.Getenv("SERVER_PORT")
+	config.ServerHost = os.Getenv("SERVER_HOST")
 	config.MongoPort = os.Getenv("MONGO_PORT")
 
 	if config.ServerHost == "" {
