@@ -5,11 +5,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/rs/zerolog/pkgerrors"
 	"github.com/vidhanio/gizmos-answer-server/config"
 	"github.com/vidhanio/gizmos-answer-server/database"
 	"github.com/vidhanio/gizmos-answer-server/httpd"
@@ -24,11 +22,7 @@ type App struct {
 func main() {
 	// Initialize zerolog
 
-	zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	zerolog.TimeFieldFormat = time.RFC3339
-	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
-	multi := zerolog.MultiLevelWriter(zerolog.ConsoleWriter{Out: os.Stdout})
-	log.Logger = zerolog.New(multi).With().Timestamp().Logger()
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})
 
 	// Configure and run the app
 
@@ -36,16 +30,42 @@ func main() {
 		Config: config.New(),
 	}
 
-	app.Database = database.New(app.Config, "vidhan-db")
+	var err error
+	app.Database, err = database.New(app.Config, "vidhan-db")
+	if err != nil {
+		log.Fatal().
+			Err(err).
+			Msg("Failed to create database.")
+	}
+
 	app.Server = httpd.New(app.Config, app.Database.Database)
+	if err != nil {
+		log.Fatal().
+			Err(err).
+			Msg("Failed to create server.")
+	}
 
+	err = app.Server.Start()
+	if err != nil {
+		log.Fatal().
+			Err(err).
+			Msg("Failed to start server.")
+	}
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
-		app.Server.Start()
-	}()
+		<-c
 
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM)
-	<-sc
+		err := app.Database.Stop()
+		if err != nil {
+			log.Error().
+				Err(err).
+				Msg("Failed to stop database.")
+		}
+
+		os.Exit(0)
+	}()
 
 	app.Database.Database.Client().Disconnect(context.Background())
 }

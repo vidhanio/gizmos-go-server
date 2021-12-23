@@ -27,15 +27,19 @@ func New(cfg *config.Config, db *mongo.Database) *Server {
 	return s
 }
 
-func (s *Server) Start() {
+func (s *Server) Start() error {
 	log.Info().Msg("Starting server...")
 
 	err := http.ListenAndServe(s.Config.ServerHost, s.Router)
 	if err != nil {
-		log.Fatal().
+		log.Error().
 			Err(err).
 			Msg("Failed to start server.")
+
+		return err
 	}
+
+	return nil
 }
 
 func (s *Server) setRoutes() {
