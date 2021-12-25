@@ -1,4 +1,4 @@
-module github.com/vidhanio/gizmos-answer-server
+module github.com/vidhanio/gizmos-go-server
 
 go 1.17
 

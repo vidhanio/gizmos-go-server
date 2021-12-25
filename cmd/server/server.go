@@ -8,9 +8,9 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/vidhanio/gizmos-answer-server/config"
-	"github.com/vidhanio/gizmos-answer-server/database"
-	"github.com/vidhanio/gizmos-answer-server/httpd"
+	"github.com/vidhanio/gizmos-go-server/config"
+	"github.com/vidhanio/gizmos-go-server/database"
+	"github.com/vidhanio/gizmos-go-server/httpd"
 )
 
 type App struct {
