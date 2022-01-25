@@ -2,7 +2,6 @@ package server
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -25,11 +24,7 @@ func (s *GizmoServer) GetGizmos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-
 	json.NewEncoder(w).Encode(NewGizmosResponse("Gizmos retrieved.", gizmos))
-
-	fmt.Println(w.Header())
 }
 
 func (s *GizmoServer) GetGizmo(w http.ResponseWriter, r *http.Request) {
@@ -152,8 +147,6 @@ func (s *GizmoServer) PutGizmo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-
 	json.NewEncoder(w).Encode(NewGizmoResponse("Gizmo updated.", nil))
 }
 
@@ -189,8 +182,6 @@ func (s *GizmoServer) DeleteGizmo(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 
 	json.NewEncoder(w).Encode(NewGizmoResponse("Gizmo deleted.", nil))
 }
