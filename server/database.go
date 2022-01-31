@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"sort"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -60,8 +59,6 @@ func (d *GizmoDB) GetGizmo(resource int) (*Gizmo, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("%+v\n", g)
 
 	return g, nil
 }
