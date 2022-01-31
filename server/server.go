@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/go-chi/cors"
 	"github.com/rs/zerolog/log"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -24,8 +25,13 @@ func New(mux *chi.Mux, db *mongo.Database) *GizmoServer {
 		ctx: context.Background(),
 	}
 
-	s.mux.Use(JSONContentTypeMiddleware)
-	s.mux.Use(LoggingMiddleware)
+	s.mux.Use(LoggingMiddleware, JSONContentTypeMiddleware, cors.Handler(
+		cors.Options{
+			AllowedOrigins: []string{"*"},
+			AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		},
+	),
+	)
 
 	s.mux.Get("/gizmos", s.GetGizmos)
 	s.mux.Get("/gizmos/{resource}", s.GetGizmo)
