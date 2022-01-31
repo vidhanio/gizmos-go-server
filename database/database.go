@@ -1,11 +1,11 @@
-package server
+package database
 
 import (
 	"context"
-	"sort"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type GizmoDB struct {
@@ -23,17 +23,17 @@ func NewGizmo(title string, materials string, description string, resource int, 
 	}
 }
 
-func NewDB(db *mongo.Database) *GizmoDB {
+func New(db *mongo.Database) *GizmoDB {
 	return &GizmoDB{
 		Database: db,
 		ctx:      context.Background(),
 	}
 }
 
-func (d *GizmoDB) GetGizmos() (Gizmos, error) {
-	gizmos := Gizmos{}
+func (d *GizmoDB) GetGizmos() ([]*Gizmo, error) {
+	gizmos := []*Gizmo{}
 
-	cursor, err := d.Collection("gizmos").Find(d.ctx, bson.M{})
+	cursor, err := d.Collection("gizmos").Find(d.ctx, bson.M{}, options.Find().SetSort(bson.M{"resource": 1}))
 	if err != nil {
 		return nil, err
 	}
@@ -47,8 +47,6 @@ func (d *GizmoDB) GetGizmos() (Gizmos, error) {
 
 		gizmos = append(gizmos, g)
 	}
-
-	sort.Sort(gizmos)
 
 	return gizmos, nil
 }

@@ -24,7 +24,7 @@ func (s *GizmoServer) GetGizmos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(NewGizmosResponse("Gizmos retrieved.", gizmos))
+	json.NewEncoder(w).Encode(NewGizmosResponse("Gizmos retrieved.", NewGizmosFromDBGizmos(gizmos)))
 }
 
 func (s *GizmoServer) GetGizmo(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +60,7 @@ func (s *GizmoServer) GetGizmo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(NewGizmoResponse("Gizmo retrieved.", gizmo))
+	json.NewEncoder(w).Encode(NewGizmoResponse("Gizmo retrieved.", NewGizmoFromDBGizmo(gizmo)))
 }
 
 func (s *GizmoServer) PostGizmo(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +79,7 @@ func (s *GizmoServer) PostGizmo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.db.InsertGizmo(gizmo)
+	err = s.db.InsertGizmo(NewDBGizmoFromGizmo(gizmo))
 	if err != nil {
 		log.Error().
 			Err(err).
@@ -126,7 +126,7 @@ func (s *GizmoServer) PutGizmo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.db.UpdateGizmo(resource, gizmo)
+	err = s.db.UpdateGizmo(resource, NewDBGizmoFromGizmo(gizmo))
 	if err == mongo.ErrNoDocuments {
 		w.WriteHeader(http.StatusNotFound)
 

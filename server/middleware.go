@@ -6,7 +6,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func LoggingMiddleware(next http.Handler) http.Handler {
+func LoggerMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			log.Debug().

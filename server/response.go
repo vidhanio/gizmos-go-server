@@ -6,8 +6,8 @@ type GizmoResponse struct {
 }
 
 type GizmosResponse struct {
-	Message string `json:"message"`
-	Gizmos  Gizmos `json:"gizmos,omitempty"`
+	Message string   `json:"message"`
+	Gizmos  []*Gizmo `json:"gizmos,omitempty"`
 }
 
 func NewGizmoResponse(message string, gizmo *Gizmo) *GizmoResponse {
@@ -17,7 +17,7 @@ func NewGizmoResponse(message string, gizmo *Gizmo) *GizmoResponse {
 	}
 }
 
-func NewGizmosResponse(message string, gizmos Gizmos) *GizmosResponse {
+func NewGizmosResponse(message string, gizmos []*Gizmo) *GizmosResponse {
 	return &GizmosResponse{
 		Message: message,
 		Gizmos:  gizmos,

@@ -9,23 +9,24 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/rs/zerolog/log"
+	"github.com/vidhanio/gizmos-go-server/database"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type GizmoServer struct {
 	mux *chi.Mux
-	db  *GizmoDB
+	db  *database.GizmoDB
 	ctx context.Context
 }
 
 func New(mux *chi.Mux, db *mongo.Database) *GizmoServer {
 	s := &GizmoServer{
 		mux: mux,
-		db:  &GizmoDB{db, context.Background()},
+		db:  database.New(db),
 		ctx: context.Background(),
 	}
 
-	s.mux.Use(LoggingMiddleware, JSONContentTypeMiddleware, cors.Handler(
+	s.mux.Use(LoggerMiddleware, JSONContentTypeMiddleware, cors.Handler(
 		cors.Options{
 			AllowedOrigins: []string{"*"},
 			AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
