@@ -5,7 +5,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/go-chi/chi"
 	"github.com/jackc/pgx"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -17,27 +16,30 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
 	log.Info().
-		Msg("Connecting to database.")
+		Msg("Initializing server...")
 
-	conn, err := pgx.Connect(pgx.ConnConfig{
+	server := server.New(sql.New(pgx.ConnConfig{
 		Host:     "localhost",
 		Port:     5432,
 		User:     "vidhanio",
 		Password: "vidhanio",
 		Database: "vidhanio",
-	})
+	}))
 
 	log.Info().
-		Msg("Connected to database.")
-
-	mux := chi.NewRouter()
-
-	server := server.New(mux, sql.New(conn))
+		Msg("Server initialized.")
 
 	log.Info().
 		Msg("Starting server...")
 
-	server.Start()
+	go func() {
+		err := server.Start()
+		if err != nil {
+			log.Fatal().
+				Err(err).
+				Msg("Failed to start server.")
+		}
+	}()
 
 	log.Info().
 		Msg("Server started.")
@@ -49,7 +51,7 @@ func main() {
 	log.Info().
 		Msg("Stopping server...")
 
-	err = server.Stop()
+	err := server.Stop()
 	if err != nil {
 		log.Error().
 			Err(err).

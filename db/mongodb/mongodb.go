@@ -14,15 +14,20 @@ type GizmoDB struct {
 	ctx context.Context
 }
 
-func New(db *mongo.Database) *GizmoDB {
+func New(uri string) *GizmoDB {
+	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
+	if err != nil {
+		panic(err)
+	}
+
 	return &GizmoDB{
-		Database: db,
+		Database: client.Database("vidhan-db"),
 		ctx:      context.Background(),
 	}
 }
 
 func (d *GizmoDB) Start() error {
-	return nil
+	return d.Client().Connect(d.ctx)
 }
 
 func (d *GizmoDB) Stop() error {

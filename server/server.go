@@ -18,9 +18,9 @@ type GizmoServer struct {
 	ctx context.Context
 }
 
-func New(mux *chi.Mux, db db.GizmoDB) *GizmoServer {
+func New(db db.GizmoDB) *GizmoServer {
 	s := &GizmoServer{
-		mux: mux,
+		mux: chi.NewRouter(),
 		db:  db,
 		ctx: context.Background(),
 	}
@@ -42,7 +42,7 @@ func New(mux *chi.Mux, db db.GizmoDB) *GizmoServer {
 	return s
 }
 
-func (s *GizmoServer) Start() {
+func (s *GizmoServer) Start() error {
 	if s.mux == nil {
 		log.Fatal().Msg("mux is nil")
 	}
@@ -51,14 +51,14 @@ func (s *GizmoServer) Start() {
 		log.Fatal().Msg("database is nil")
 	}
 
-	go func() {
-		err := http.ListenAndServe(":8000", s.mux)
-		if err != nil {
-			log.Fatal().
-				Err(err).
-				Msg("failed to start server")
-		}
-	}()
+	err := s.db.Start()
+	if err != nil {
+		return err
+	}
+
+	err = http.ListenAndServe(":8000", s.mux)
+
+	return err
 }
 
 func (s *GizmoServer) Stop() error {

@@ -1,21 +1,22 @@
 package sql
 
 import (
-	"context"
-
 	"github.com/jackc/pgx"
 	"github.com/vidhanio/gizmos-go-server/db"
 )
 
 type GizmoDB struct {
 	*pgx.Conn
-	ctx context.Context
 }
 
-func New(conn *pgx.Conn) *GizmoDB {
+func New(cfg pgx.ConnConfig) *GizmoDB {
+	conn, err := pgx.Connect(cfg)
+	if err != nil {
+		panic(err)
+	}
+
 	return &GizmoDB{
 		Conn: conn,
-		ctx:  context.Background(),
 	}
 }
 
