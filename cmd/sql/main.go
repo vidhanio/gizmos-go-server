@@ -1,17 +1,16 @@
 package main
 
 import (
-	"context"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/go-chi/chi"
+	"github.com/jackc/pgx"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+	"github.com/vidhanio/gizmos-go-server/db/sql"
 	"github.com/vidhanio/gizmos-go-server/server"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
@@ -20,26 +19,20 @@ func main() {
 	log.Info().
 		Msg("Connecting to database.")
 
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
-	if err != nil {
-		log.Fatal().
-			Msg("Failed to create MongoDB client.")
-	}
-
-	err = client.Connect(context.Background())
-	if err != nil {
-		log.Fatal().
-			Msg("Failed to connect to MongoDB.")
-	}
-
-	database := client.Database("vidhan-db")
+	conn, err := pgx.Connect(pgx.ConnConfig{
+		Host:     "localhost",
+		Port:     5432,
+		User:     "vidhanio",
+		Password: "vidhanio",
+		Database: "vidhanio",
+	})
 
 	log.Info().
 		Msg("Connected to database.")
 
 	mux := chi.NewRouter()
 
-	server := server.New(mux, database)
+	server := server.New(mux, sql.New(conn))
 
 	log.Info().
 		Msg("Starting server...")

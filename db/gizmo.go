@@ -1,4 +1,4 @@
-package database
+package db
 
 type Gizmo struct {
 	Title       string   `bson:"title"`

@@ -9,20 +9,19 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
 	"github.com/rs/zerolog/log"
-	"github.com/vidhanio/gizmos-go-server/database"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/vidhanio/gizmos-go-server/db"
 )
 
 type GizmoServer struct {
 	mux *chi.Mux
-	db  *database.GizmoDB
+	db  db.GizmoDB
 	ctx context.Context
 }
 
-func New(mux *chi.Mux, db *mongo.Database) *GizmoServer {
+func New(mux *chi.Mux, db db.GizmoDB) *GizmoServer {
 	s := &GizmoServer{
 		mux: mux,
-		db:  database.New(db),
+		db:  db,
 		ctx: context.Background(),
 	}
 
@@ -71,7 +70,7 @@ func (s *GizmoServer) Stop() error {
 		return errors.New("database is nil")
 	}
 
-	return s.db.Client().Disconnect(s.ctx)
+	return s.db.Stop()
 }
 
 func (s *GizmoServer) ctxTimeout(timeout int) (context.Context, context.CancelFunc) {

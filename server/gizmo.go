@@ -1,6 +1,6 @@
 package server
 
-import "github.com/vidhanio/gizmos-go-server/database"
+import "github.com/vidhanio/gizmos-go-server/db"
 
 type Gizmo struct {
 	Title       string   `json:"title"`
@@ -10,7 +10,7 @@ type Gizmo struct {
 	Answers     []string `json:"answers"`
 }
 
-func NewGizmoFromDBGizmo(dbGizmo *database.Gizmo) *Gizmo {
+func NewGizmoFromDBGizmo(dbGizmo *db.Gizmo) *Gizmo {
 	return &Gizmo{
 		Title:       dbGizmo.Title,
 		Materials:   dbGizmo.Materials,
@@ -20,7 +20,7 @@ func NewGizmoFromDBGizmo(dbGizmo *database.Gizmo) *Gizmo {
 	}
 }
 
-func NewGizmosFromDBGizmos(dbGizmos []*database.Gizmo) []*Gizmo {
+func NewGizmosFromDBGizmos(dbGizmos []*db.Gizmo) []*Gizmo {
 	gizmos := make([]*Gizmo, len(dbGizmos))
 
 	for i, dbGizmo := range dbGizmos {
@@ -30,8 +30,8 @@ func NewGizmosFromDBGizmos(dbGizmos []*database.Gizmo) []*Gizmo {
 	return gizmos
 }
 
-func NewDBGizmoFromGizmo(gizmo *Gizmo) *database.Gizmo {
-	return &database.Gizmo{
+func NewDBGizmoFromGizmo(gizmo *Gizmo) *db.Gizmo {
+	return &db.Gizmo{
 		Title:       gizmo.Title,
 		Materials:   gizmo.Materials,
 		Description: gizmo.Description,
@@ -40,8 +40,8 @@ func NewDBGizmoFromGizmo(gizmo *Gizmo) *database.Gizmo {
 	}
 }
 
-func NewDBGizmosFromGizmos(gizmos []*Gizmo) []*database.Gizmo {
-	dbGizmos := make([]*database.Gizmo, len(gizmos))
+func NewDBGizmosFromGizmos(gizmos []*Gizmo) []*db.Gizmo {
+	dbGizmos := make([]*db.Gizmo, len(gizmos))
 
 	for i, gizmo := range gizmos {
 		dbGizmos[i] = NewDBGizmoFromGizmo(gizmo)

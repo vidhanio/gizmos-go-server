@@ -1,8 +1,9 @@
-package database
+package mongodb
 
 import (
 	"context"
 
+	"github.com/vidhanio/gizmos-go-server/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -13,16 +14,6 @@ type GizmoDB struct {
 	ctx context.Context
 }
 
-func NewGizmo(title string, materials string, description string, resource int, answers []string) *Gizmo {
-	return &Gizmo{
-		Title:       title,
-		Materials:   materials,
-		Description: description,
-		Resource:    resource,
-		Answers:     answers,
-	}
-}
-
 func New(db *mongo.Database) *GizmoDB {
 	return &GizmoDB{
 		Database: db,
@@ -30,8 +21,16 @@ func New(db *mongo.Database) *GizmoDB {
 	}
 }
 
-func (d *GizmoDB) GetGizmos() ([]*Gizmo, error) {
-	gizmos := []*Gizmo{}
+func (d *GizmoDB) Start() error {
+	return nil
+}
+
+func (d *GizmoDB) Stop() error {
+	return d.Client().Disconnect(d.ctx)
+}
+
+func (d *GizmoDB) GetGizmos() ([]*db.Gizmo, error) {
+	gizmos := []*db.Gizmo{}
 
 	cursor, err := d.Collection("gizmos").Find(d.ctx, bson.M{}, options.Find().SetSort(bson.M{"resource": 1}))
 	if err != nil {
@@ -39,7 +38,7 @@ func (d *GizmoDB) GetGizmos() ([]*Gizmo, error) {
 	}
 
 	for cursor.Next(d.ctx) {
-		g := &Gizmo{}
+		g := &db.Gizmo{}
 		err := cursor.Decode(g)
 		if err != nil {
 			return nil, err
@@ -51,8 +50,8 @@ func (d *GizmoDB) GetGizmos() ([]*Gizmo, error) {
 	return gizmos, nil
 }
 
-func (d *GizmoDB) GetGizmo(resource int) (*Gizmo, error) {
-	g := &Gizmo{}
+func (d *GizmoDB) GetGizmo(resource int) (*db.Gizmo, error) {
+	g := &db.Gizmo{}
 	err := d.Collection("gizmos").FindOne(d.ctx, bson.M{"resource": resource}).Decode(g)
 	if err != nil {
 		return nil, err
@@ -61,7 +60,7 @@ func (d *GizmoDB) GetGizmo(resource int) (*Gizmo, error) {
 	return g, nil
 }
 
-func (d *GizmoDB) InsertGizmo(g *Gizmo) error {
+func (d *GizmoDB) InsertGizmo(g *db.Gizmo) error {
 	_, err := d.Collection("gizmos").InsertOne(d.ctx, g)
 	if err != nil {
 		return err
@@ -70,7 +69,7 @@ func (d *GizmoDB) InsertGizmo(g *Gizmo) error {
 	return nil
 }
 
-func (d *GizmoDB) UpdateGizmo(resource int, g *Gizmo) error {
+func (d *GizmoDB) UpdateGizmo(resource int, g *db.Gizmo) error {
 	result, err := d.Collection("gizmos").UpdateOne(d.ctx, bson.M{"resource": resource}, bson.M{"$set": g})
 	if err != nil {
 		return err
