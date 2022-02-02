@@ -17,7 +17,7 @@ func main() {
 	log.Info().
 		Msg("Initializing server...")
 
-	server := server.New(mongodb.New("mongodb://localhost:27017"))
+	server := server.New(mongodb.New("mongodb://localhost:27017", "vidhanio"))
 
 	log.Info().
 		Msg("Server initialized.")
