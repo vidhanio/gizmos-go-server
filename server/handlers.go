@@ -7,7 +7,6 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/rs/zerolog/log"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func (s *GizmoServer) GetGizmos(w http.ResponseWriter, r *http.Request) {
@@ -38,16 +37,18 @@ func (s *GizmoServer) GetGizmo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	gizmo, err := s.db.GetGizmo(resource)
-	if err == mongo.ErrNoDocuments {
-		http.Error(w, "Gizmo not found.", http.StatusNotFound)
-
-		return
-	} else if err != nil {
+	if err != nil {
 		log.Error().
 			Err(err).
 			Msg("Error getting gizmo.")
 
 		http.Error(w, "Error getting gizmo.", http.StatusInternalServerError)
+
+		return
+	}
+
+	if gizmo == nil {
+		http.Error(w, "Gizmo not found.", http.StatusNotFound)
 
 		return
 	}
@@ -111,11 +112,7 @@ func (s *GizmoServer) PutGizmo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = s.db.UpdateGizmo(resource, NewDBGizmoFromGizmo(gizmo))
-	if err == mongo.ErrNoDocuments {
-		http.Error(w, "Gizmo not found.", http.StatusNotFound)
-
-		return
-	} else if err != nil {
+	if err != nil {
 		log.Error().
 			Err(err).
 			Msg("Error updating gizmo.")
@@ -141,13 +138,7 @@ func (s *GizmoServer) DeleteGizmo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = s.db.DeleteGizmo(resource)
-	if err == mongo.ErrNoDocuments {
-		w.WriteHeader(http.StatusNotFound)
-
-		http.Error(w, "Gizmo not found.", http.StatusNotFound)
-
-		return
-	} else if err != nil {
+	if err != nil {
 		log.Error().
 			Err(err).
 			Msg("Error deleting gizmo.")

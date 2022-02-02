@@ -8,22 +8,21 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
-	"github.com/vidhanio/gizmos-go-server/db/mongodb"
+	"github.com/vidhanio/gizmos-go-server/db/json"
 	"github.com/vidhanio/gizmos-go-server/server"
 )
 
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
-	mongoURI := flag.String("mongo-uri", "mongodb://localhost:27017", "The URI of the Mongo database")
-	dbName := flag.String("db-name", "gizmos", "The name of the Mongo database")
+	filename := flag.String("filename", "gizmos.json", "The filename of the gizmos json database")
 
 	flag.Parse()
 
 	log.Info().
 		Msg("Initializing server...")
 
-	server := server.New(mongodb.New(*mongoURI, *dbName))
+	server := server.New(json.New(*filename))
 
 	log.Info().
 		Msg("Server initialized.")

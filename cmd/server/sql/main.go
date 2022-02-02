@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"os"
 	"os/signal"
 	"syscall"
@@ -15,15 +16,23 @@ import (
 func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 
+	dbHost := flag.String("db-host", "localhost", "The host of the SQL database")
+	dbPort := flag.Int("db-port", 5432, "The port of the SQL database")
+	dbUser := flag.String("db-user", "vidhanio", "The user of the SQL database")
+	dbPass := flag.String("db-pass", "vidhanio", "The password of the SQL database")
+	dbName := flag.String("db-name", "vidhanio", "The name of the SQL database")
+
+	flag.Parse()
+
 	log.Info().
 		Msg("Initializing server...")
 
 	server := server.New(sql.New(pgx.ConnConfig{
-		Host:     "localhost",
-		Port:     5432,
-		User:     "vidhanio",
-		Password: "vidhanio",
-		Database: "vidhanio",
+		Host:     *dbHost,
+		Port:     uint16(*dbPort),
+		User:     *dbUser,
+		Password: *dbPass,
+		Database: *dbName,
 	}))
 
 	log.Info().
